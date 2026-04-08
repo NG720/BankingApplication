@@ -20,12 +20,21 @@ public class BankingApplication {
     static int oturumdakiMusteriIndex = -1; // Giriş yapan kullanıcıyı takip eder
 
     public static void main(String[] args) {
-        // Test için bir tane örnek kullanıcı ekledim
+        // Test için bir tane örnek kullanıcı ekleyelim
         musteriler.add("admin");
         sifreler.add("1234");
         bakiyeler.add(1000.0);
 
+        musteriler.add("mehmet_bankaci");
+        sifreler.add("5555");
+        bakiyeler.add(2500.0);
+
+        musteriler.add("ayse_müsteri");
+        sifreler.add("9999");
+        bakiyeler.add(50.0);
+
         System.out.println("=== BANKA SISTEMINE HOS GELDINIZ ===");
+ 
 
         while (true) {
             // GİRİŞ EKRANI
@@ -36,8 +45,11 @@ public class BankingApplication {
                 System.out.println("3- Veritabanını Gör (Admin)"); 
                 System.out.println("4- Çıkış");
                 System.out.print("Seçiminiz: ");
-                int secim = scanner.nextInt();
+                int secim;
+                try { secim = scanner.nextInt(); } 
+                catch (Exception e) { scanner.nextLine(); continue; }
                 scanner.nextLine();
+
 
                 if (secim == 1) kayitOl();
                 else if (secim == 2) girisYap();
@@ -49,13 +61,18 @@ public class BankingApplication {
                 System.out.println("1- Bakiye Sorgula");
                 System.out.println("2- Para Yatır");
                 System.out.println("3- Para Çek");
-                System.out.println("4- Oturumu Kapat");
+                System.out.println("4- Para Transferi"); 
+                System.out.println("5- Oturumu Kapat");
                 System.out.print("Seçiminiz: ");
-                int islem = scanner.nextInt();
+                int islem;
+                try { islem = scanner.nextInt(); } 
+                catch (Exception e) { scanner.nextLine(); continue; }
+                scanner.nextLine();
 
                 if (islem == 1) bakiyeGoster();
                 else if (islem == 2) paraYatir();
                 else if (islem == 3) paraCek();
+                else if (islem == 4) paraTransferi();
                 else oturumdakiMusteriIndex = -1;
             }
         }
@@ -134,4 +151,31 @@ public class BankingApplication {
             System.out.println("Yetersiz bakiye!");
         }
     }
+    
+    // ÖZELLİK 6 : TRANSFER (HAVALE)
+    public static void paraTransferi() {
+        System.out.print("Para göndermek istediğiniz Kullanıcı Adı: ");
+        String aliciAd = scanner.nextLine();
+        
+        int aliciIndex = musteriler.indexOf(aliciAd);
+        
+        if (aliciIndex != -1 && aliciIndex != oturumdakiMusteriIndex) {
+            System.out.print("Gönderilecek miktar: ");
+            double miktar = scanner.nextDouble();
+            scanner.nextLine();
+            
+            if (bakiyeler.get(oturumdakiMusteriIndex) >= miktar) {
+                // Gönderen bakiyesini düşür
+                bakiyeler.set(oturumdakiMusteriIndex, bakiyeler.get(oturumdakiMusteriIndex) - miktar);
+                // Alıcı bakiyesini artır
+                bakiyeler.set(aliciIndex, bakiyeler.get(aliciIndex) + miktar);
+                System.out.println("Transfer başarıyla gerçekleşti!");
+            } else {
+                System.out.println("Yetersiz bakiye!");
+            }
+        } else {
+            System.out.println("Geçersiz alıcı!");
+        }
+    }
+
 }
